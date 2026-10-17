@@ -23,8 +23,7 @@ static async Task<(int ExitCode, string Output, string Error)> RunBashAsync(stri
     return (process.ExitCode, await outputTask, await errorTask);
 }
 
-// Использование
-var (code, output, error) = await RunBashAsync("ls -la /home | grep user");
+var (code, output, error) = await RunBashAsync("ls -la /home");
 Console.WriteLine($"Код выхода: {code}");
 Console.WriteLine(output);
 if (code != 0) Console.WriteLine($"Ошибка: {error}");
