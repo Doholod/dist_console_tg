@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "6M8UDG9heFM=",
+  "dgSpecHash": "Y7+ZDKKWoiM=",
   "success": true,
   "projectFilePath": "C:\\Games\\My programms\\dist_console_tg\\dist_console_tg.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\egorc\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\egorc\\.nuget\\packages\\microsoft.extensions.options\\8.0.0\\microsoft.extensions.options.8.0.0.nupkg.sha512",
+    "C:\\Users\\egorc\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "C:\\Users\\egorc\\.nuget\\packages\\telegram.bot\\22.10.3.3\\telegram.bot.22.10.3.3.nupkg.sha512"
+  ],
   "logs": []
 }
