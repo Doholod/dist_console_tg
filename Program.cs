@@ -1,29 +1,61 @@
-﻿using System.Diagnostics;
+﻿using Telegram.Bot;
+using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
-static async Task<(int ExitCode, string Output, string Error)> RunBashAsync(string command)
+class Program
 {
-    var psi = new ProcessStartInfo
+    static TelegramBotClient bot;
+    static async Task Main(string[] args)
     {
-        FileName = "/bin/bash",
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        UseShellExecute = false,
-        CreateNoWindow = true
-    };
-    psi.ArgumentList.Add("-c");
-    psi.ArgumentList.Add(command);
+        var token = args.Length > 0
+            ? args[0]
+            : Environment.GetEnvironmentVariable("BOT_TOKEN")
+              ?? throw new InvalidOperationException("Токен не задан");
 
-    using var process = new Process { StartInfo = psi };
-    process.Start();
+        using var cts = new CancellationTokenSource();
 
-    var outputTask = process.StandardOutput.ReadToEndAsync();
-    var errorTask = process.StandardError.ReadToEndAsync();
-    await process.WaitForExitAsync();
 
-    return (process.ExitCode, await outputTask, await errorTask);
+        bot = new TelegramBotClient(token);
+
+        try
+        {
+            var me = await bot.GetMe();
+            Console.WriteLine("Соединение успешно!");
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("unknown bot");
+        }
+
+        bot.OnMessage += OnMessage;
+        bot.OnError += OnError;
+
+        try { await Task.Delay(Timeout.Infinite, cts.Token); }
+        catch (OperationCanceledException) { }
+
+    }
+
+    static async Task OnMessage(Message msg, UpdateType type)
+    {
+        if (!string.IsNullOrEmpty(msg.Text))
+        {
+            var (exitCode, output, error) = await Bash.RunBashAsync(msg.Text);
+            if (exitCode != 0)
+            {
+                // Console.WriteLine($"TEXT: {msg.Text}, ExitCode:{exitCode}, output:{output}, error:{error}");
+                await bot.SendMessage(msg.Chat.Id, $"Code {exitCode} {error}");
+            }
+            else
+            {
+                await bot.SendMessage(msg.Chat.Id, $"{output}");
+            }
+        }
+    }
+    static Task OnError(Exception ex, HandleErrorSource source)
+    {
+        Console.WriteLine($"Ошибка ({source}): {ex}");
+        return Task.CompletedTask;
+    }
+
 }
-
-var (code, output, error) = await RunBashAsync("ls -la /home");
-Console.WriteLine($"Код выхода: {code}");
-Console.WriteLine(output);
-if (code != 0) Console.WriteLine($"Ошибка: {error}");
